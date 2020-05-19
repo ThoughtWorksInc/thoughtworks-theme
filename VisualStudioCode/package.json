@@ -1,0 +1,21 @@
+{
+	"name": "thoughtworks-theme",
+	"displayName": "ThoughtWorks Theme",
+	"description": "Based on default light theme in vscode.",
+	"categories": ["Themes"],
+	"version": "0.1.0",
+	"publisher": "dqisme",
+	"engines": {
+		"vscode": "*"
+	},
+	"contributes": {
+		"themes": [
+			{
+				"label": "ThoughtWorks",
+				"uiTheme": "vs",
+				"path": "./thoughtworks.json"
+			}
+		]
+	},
+	"icon": "icon.jpg"
+}
