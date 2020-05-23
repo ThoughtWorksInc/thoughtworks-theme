@@ -5,6 +5,11 @@
 	"categories": ["Themes"],
 	"version": "0.1.0",
 	"publisher": "dqisme",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ThoughtWorksInc/thoughtworks-theme.git",
+		"directory": "VisualStudioCode"
+	},
 	"engines": {
 		"vscode": "*"
 	},
@@ -17,5 +22,8 @@
 			}
 		]
 	},
-	"icon": "icon.jpg"
+	"icon": "icon.png",
+	"scripts": {
+		"build": "npx vsce package"
+	}
 }
