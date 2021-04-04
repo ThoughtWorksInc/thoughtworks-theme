@@ -1,0 +1,29 @@
+{
+	"name": "thoughtworks-theme-green",
+	"displayName": "ThoughtWorks Theme (Green)",
+	"description": "Based on default light theme in vscode.",
+	"categories": ["Themes"],
+	"version": "0.1.0",
+	"publisher": "dqisme",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ThoughtWorksInc/thoughtworks-theme.git",
+		"directory": "VisualStudioCode/green"
+	},
+	"engines": {
+		"vscode": "*"
+	},
+	"contributes": {
+		"themes": [
+			{
+				"label": "ThoughtWorks",
+				"uiTheme": "vs",
+				"path": "./thoughtworks.green.json"
+			}
+		]
+	},
+	"icon": "icon.green.png",
+	"scripts": {
+		"build": "npx vsce package"
+	}
+}
