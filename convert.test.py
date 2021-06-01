@@ -1,6 +1,6 @@
+import inspect
 import unittest
-from unittest import mock
-from convert import convert, find_nearest_colour
+from convert import convert
 
 
 class TestConvert(unittest.TestCase):
@@ -12,27 +12,71 @@ class TestConvert(unittest.TestCase):
         self.assertEqual(convert("anything"), "anything")
 
     def test_convert_to_colours_in_palette(self):
-        self.assertEqual(convert("#f0f0f0", ['#ffffff']), "#ffffff")
+        self.assertEqual(convert("#f0f0f0", "#ffffff"), "#ffffff")
 
-    def test_convert_to_least_euclidean_distance_colour_in_palette(self):
-        self.assertEqual(convert("#123456", ["#ff0000", "#00ff00", "#0000ff"]), "#0000ff")
+    def test_convert_to_least_euclidean_distance_colour_in_palette_when_no_distance_type_specified(self):
+        # sqrt(49) < sqrt(51) < sqrt(57)
+        self.assertEqual(convert(
+            "#000000",
+            inspect.cleandoc(
+                """
+                #020306
+                #040405
+                #010107
+                """
+            )),
+            "#020306")
+
+    def test_convert_to_least_manhattan_distance_colour_in_palette_when_the_distance_type_specified(self):
+        # 1+1+7=9 < 2+3+6=11 < 4+4+5=13
+        self.assertEqual(convert(
+            "#000000",
+            inspect.cleandoc(
+                """
+                #020306
+                #040405
+                #010107
+                """
+            ), "manhattan"),
+            "#010107")
+
+    def test_convert_to_least_uniform_distance_colour_in_palette_when_the_distance_type_specified(self):
+        # 5 < 6 < 7
+        self.assertEqual(convert(
+            "#000000",
+            inspect.cleandoc(
+                """
+                #020306
+                #040405
+                #010107
+                """
+            ), "uniform"),
+            "#040405")
 
     def test_convert_all_the_colour_like_text_in_the_content(self):
-        self.assertEqual(convert("""
-            <colour>#123456</colour>
-            <anotherColour>#654321</anotherColour>
-        """, ["#ff0000", "#00ff00", "#0000ff"]), """
-            <colour>#0000ff</colour>
-            <anotherColour>#ff0000</anotherColour>
-        """)
+        self.assertEqual(convert(
+            inspect.cleandoc(
+                """
+                <colour>#123456</colour>
+                <anotherColour>#654321</anotherColour>
+                """
+            ),
+            inspect.cleandoc(
+                """
+                #ff0000
+                #00ff00
+                #0000ff
+                """
+            )),
+            inspect.cleandoc(
+                """
+                <colour>#0000ff</colour>
+                <anotherColour>#ff0000</anotherColour>
+                """
+            ))
 
     def test_convert_case_insensitively(self):
-        self.assertEqual(convert("#ABCDEF", ["#000000"]), "#000000")
-
-    @mock.patch('convert.find_nearest_colour', wraps=find_nearest_colour)
-    def test_should_merge_duplicated_colour_in_content(self, spied_find_nearest_colour):
-        convert("#ABCDEF,#ABCDEF", ["#000000"])
-        self.assertEqual(spied_find_nearest_colour.call_count, 1)
+        self.assertEqual(convert("#ABCDEF", "#000000"), "#000000")
 
 
 if __name__ == '__main__':
