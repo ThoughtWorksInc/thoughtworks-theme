@@ -6,7 +6,7 @@ import sys
 class Colour:
     def __init__(self, text):
         self.text = text
-        self.rgb = evaluate(text)
+        self.rgb = tuple(map(lambda value: int(value, base=16), (text[i:i + 2] for i in range(1, 7, 2))))
 
     def __eq__(self, other):
         return all(value == another_value
@@ -15,36 +15,31 @@ class Colour:
     def __repr__(self):
         return "Colour(text=" + self.text + ",rgb=" + ",".join(map(str, self.rgb)) + ")"
 
-
-def evaluate(colour):
-    return tuple(map(lambda value: int(value, base=16), (colour[i:i + 2] for i in range(1, 7, 2))))
-
-
-def get_euclidean_distance(colour, another_colour):
-    return math.sqrt(sum(tuple(math.pow(value - another_value, 2)
-                               for (value, another_value) in zip(colour.rgb, another_colour.rgb))))
+    def __sub__(self, other):
+        return ColourDistance(self, other)
 
 
-def get_manhattan_distance(colour, another_colour):
-    return sum(tuple(abs(value - another_value)
-                     for (value, another_value) in zip(colour.rgb, another_colour.rgb)))
+class ColourDistance:
+    types = {
+        "euclidean": lambda differences: math.sqrt(sum(tuple(math.pow(difference, 2) for difference in differences))),
+        "manhattan": lambda differences: sum(tuple(abs(difference) for difference in differences)),
+        "uniform": lambda differences: max(tuple(abs(difference) for difference in differences)),
+    }
 
+    def __init__(self, colour, other_colour):
+        self.rgb_differences = tuple((value - other_value)
+                                     for (value, other_value) in zip(colour.rgb, other_colour.rgb))
 
-def get_uniform_distance(colour, another_colour):
-    return max(tuple(abs(value - another_value)
-                     for (value, another_value) in zip(colour.rgb, another_colour.rgb)))
+    def __eq__(self, other):
+        return all(value == other_value
+                   for (value, other_value) in zip(self.rgb_differences, other.rgb_differences))
 
-
-distance_types = {
-    'euclidean': get_euclidean_distance,
-    'manhattan': get_manhattan_distance,
-    'uniform': get_uniform_distance
-}
+    def __getitem__(self, distance_type):
+        return self.types.get(distance_type, self.types["euclidean"])(self.rgb_differences)
 
 
 def find_nearest_colour(palette_colours, theme_colour, distance_type):
-    distance_calculator = distance_types.get(distance_type, get_euclidean_distance)
-    return min(palette_colours, key=lambda palette_colour: distance_calculator(theme_colour, palette_colour))
+    return min(palette_colours, key=lambda palette_colour: (theme_colour - palette_colour)[distance_type])
 
 
 def substitute(theme, theme_colour_to_palette_colour):
@@ -67,7 +62,7 @@ def convert(theme="", palette="", distance_type=""):
 def main():
     palette_file_name = sys.argv[1]
     theme_file_name = sys.argv[2]
-    for distance_type in distance_types.keys():
+    for distance_type in ColourDistance.types.keys():
         theme_file_name_parts = theme_file_name.split('.')
         theme_file_name_extension = theme_file_name_parts[-1]
         converted_theme_file_name = '.'.join(theme_file_name_parts[0:-1] + [distance_type, theme_file_name_extension])

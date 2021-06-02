@@ -1,6 +1,7 @@
 import inspect
+import math
 import unittest
-from convert import convert, find_nearest_colour, Colour
+from convert import convert, find_nearest_colour, Colour, ColourDistance
 
 
 class TestConvert(unittest.TestCase):
@@ -80,7 +81,7 @@ class TestConvert(unittest.TestCase):
 
 
 class TestFindNearestColour(unittest.TestCase):
-    def test_find_nearest_colour_by_euclidean_distance_when_distance_type_is_empty(self):
+    def test_find_nearest_colour_by_euclidean_distance_when_no_distance_type_is_specified(self):
         self.assertEqual(find_nearest_colour(
             [Colour("#000000"), Colour("#010101")], Colour("#010101"), ""),
             Colour("#010101"))
@@ -108,6 +109,34 @@ class TestColour(unittest.TestCase):
 
     def test_colour_unequals_when_rgb_is_different(self):
         self.assertNotEqual(Colour("#000000"), Colour("#123456"))
+
+    def test_colours_subtraction_results_in_a_colour_distance(self):
+        self.assertEqual(Colour("#010101") - Colour("#000000"), ColourDistance(Colour("#010101"), Colour("#000000")))
+
+
+class TestColourDifference(unittest.TestCase):
+    def test_colour_distance_calculates_rgb_respective_differences(self):
+        self.assertTupleEqual(ColourDistance(Colour("#010101"), Colour("#000000")).rgb_differences, (1, 1, 1))
+
+    def test_colour_distances_equal_when_they_have_same_differences(self):
+        self.assertEqual(ColourDistance(Colour("#010101"), Colour("#000000")),
+                         ColourDistance(Colour("#020202"), Colour("#010101")))
+
+    def test_colour_distance_calculates_euclidean_distance_when_distance_type_is_invalid(self):
+        self.assertEqual(ColourDistance(Colour("#010101"), Colour("#000000"))[None],
+                         math.sqrt(3))
+
+    def test_colour_distance_calculates_euclidean_distance_when_distance_type_is_specified(self):
+        self.assertEqual(ColourDistance(Colour("#010101"), Colour("#000000"))["euclidean"],
+                         math.sqrt(3))
+
+    def test_colour_distance_calculates_manhattan_distance_when_distance_type_is_specified(self):
+        self.assertEqual(ColourDistance(Colour("#010101"), Colour("#000000"))["manhattan"],
+                         3)
+
+    def test_colour_distance_calculates_uniform_distance_when_distance_type_is_specified(self):
+        self.assertEqual(ColourDistance(Colour("#010101"), Colour("#000000"))["uniform"],
+                         1)
 
 
 if __name__ == '__main__':
