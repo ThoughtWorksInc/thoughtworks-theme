@@ -1,6 +1,6 @@
 import inspect
 import unittest
-from convert import convert
+from convert import convert, find_nearest_colour, Colour
 
 
 class TestConvert(unittest.TestCase):
@@ -77,6 +77,37 @@ class TestConvert(unittest.TestCase):
 
     def test_convert_case_insensitively(self):
         self.assertEqual(convert("#ABCDEF", "#000000"), "#000000")
+
+
+class TestFindNearestColour(unittest.TestCase):
+    def test_find_nearest_colour_by_euclidean_distance_when_distance_type_is_empty(self):
+        self.assertEqual(find_nearest_colour(
+            [Colour("#000000"), Colour("#010101")], Colour("#010101"), ""),
+            Colour("#010101"))
+
+    def test_find_nearest_colour_by_euclidean_distance(self):
+        self.assertEqual(find_nearest_colour(
+            [Colour("#ff0000"), Colour("#00ff00"), Colour("#0000ff")], Colour("#123456"), ""),
+            Colour("#0000ff"))
+
+
+class TestColour(unittest.TestCase):
+    def test_colour_evaluates_rgb_when_instantiating(self):
+        self.assertTupleEqual(Colour("#000000").rgb, (0, 0, 0))
+
+    def test_colour_represents_as_comma_delimited_text(self):
+        self.assertEqual(repr(Colour("#000000")), "Colour(text=#000000,rgb=0,0,0)")
+
+    def test_colour_represents_twice(self):
+        colour = Colour("#000000")
+        self.assertEqual(repr(colour), "Colour(text=#000000,rgb=0,0,0)")
+        self.assertEqual(repr(colour), "Colour(text=#000000,rgb=0,0,0)")
+
+    def test_colour_equals_when_text_is_exactly_same(self):
+        self.assertEqual(Colour("#000000"), Colour("#000000"))
+
+    def test_colour_unequals_when_rgb_is_different(self):
+        self.assertNotEqual(Colour("#000000"), Colour("#123456"))
 
 
 if __name__ == '__main__':

@@ -1,29 +1,38 @@
-import functools
 import math
 import re
 import sys
 
 
+class Colour:
+    def __init__(self, text):
+        self.text = text
+        self.rgb = evaluate(text)
+
+    def __eq__(self, other):
+        return all(value == another_value
+                   for (value, another_value) in zip(self.rgb, other.rgb))
+
+    def __repr__(self):
+        return "Colour(text=" + self.text + ",rgb=" + ",".join(map(str, self.rgb)) + ")"
+
+
 def evaluate(colour):
-    return map(functools.partial(int, base=16), list(colour[i:i + 2] for i in range(1, 7, 2)))
+    return tuple(map(lambda value: int(value, base=16), (colour[i:i + 2] for i in range(1, 7, 2))))
 
 
 def get_euclidean_distance(colour, another_colour):
-    return math.sqrt(sum(tuple(
-        math.pow(value - another_value, 2) for (value, another_value) in
-        zip(*map(evaluate, (colour, another_colour))))))
+    return math.sqrt(sum(tuple(math.pow(value - another_value, 2)
+                               for (value, another_value) in zip(colour.rgb, another_colour.rgb))))
 
 
 def get_manhattan_distance(colour, another_colour):
-    return sum(tuple(
-        abs(value - another_value) for (value, another_value) in
-        zip(*map(evaluate, (colour, another_colour)))))
+    return sum(tuple(abs(value - another_value)
+                     for (value, another_value) in zip(colour.rgb, another_colour.rgb)))
 
 
 def get_uniform_distance(colour, another_colour):
-    return max(tuple(
-        abs(value - another_value) for (value, another_value) in
-        zip(*map(evaluate, (colour, another_colour)))))
+    return max(tuple(abs(value - another_value)
+                     for (value, another_value) in zip(colour.rgb, another_colour.rgb)))
 
 
 distance_types = {
@@ -33,9 +42,9 @@ distance_types = {
 }
 
 
-def find_nearest_colour(palette, colour, distance_type):
+def find_nearest_colour(palette_colours, theme_colour, distance_type):
     distance_calculator = distance_types.get(distance_type, get_euclidean_distance)
-    return min(palette, key=functools.partial(distance_calculator, another_colour=colour))
+    return min(palette_colours, key=lambda palette_colour: distance_calculator(theme_colour, palette_colour))
 
 
 def substitute(theme, theme_colour_to_palette_colour):
@@ -45,10 +54,11 @@ def substitute(theme, theme_colour_to_palette_colour):
 
 def convert(theme="", palette="", distance_type=""):
     if palette:
-        palette_colours = palette.splitlines()
-        theme_colours = set(re.compile(r'#[0-9a-f]{6}', re.IGNORECASE).findall(theme))
+        palette_colours = list(map(Colour, palette.splitlines()))
+        theme_colours = list(map(Colour, set(re.compile(r'#[0-9a-f]{6}', re.IGNORECASE).findall(theme))))
         theme_colour_to_palette_colour = {
-            colour: find_nearest_colour(palette_colours, colour, distance_type) for colour in theme_colours
+            theme_colour.text: find_nearest_colour(palette_colours, theme_colour, distance_type).text
+            for theme_colour in theme_colours
         }
         return substitute(theme, theme_colour_to_palette_colour)
     return theme

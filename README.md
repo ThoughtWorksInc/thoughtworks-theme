@@ -31,5 +31,5 @@ in which the `ThoughtWorks.palette` is a palette file with lines of colour-like 
 And also test the convertor by
 
 ```shell
-    python3 convert.test.py
+    python3 test_convert.py
 ```
