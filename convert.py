@@ -3,10 +3,22 @@ import re
 import sys
 
 
+class ColourFormat:
+    def __init__(self, regex, evaluate):
+        self.regex = regex
+        self.evaluate = evaluate
+
+
 class Colour:
-    def __init__(self, text):
+    formats = {
+        "hex": ColourFormat(
+            r'#[0-9a-f]{6}',
+            lambda text: tuple(map(lambda value: int(value, base=16), (text[i:i + 2] for i in range(1, 7, 2))))),
+    }
+
+    def __init__(self, text, format):
         self.text = text
-        self.rgb = tuple(map(lambda value: int(value, base=16), (text[i:i + 2] for i in range(1, 7, 2))))
+        self.rgb = self.formats[format].evaluate(text)
 
     def __eq__(self, other):
         return all(value == another_value
@@ -47,10 +59,16 @@ def substitute(theme, theme_colour_to_palette_colour):
     return pattern.sub(lambda matched_colour: theme_colour_to_palette_colour[matched_colour.group()], theme)
 
 
-def convert(theme="", palette="", distance_type=""):
+def read_theme_colours(theme, theme_colour_format):
+    return set(re.compile(Colour.formats[theme_colour_format].regex, re.IGNORECASE).findall(theme))
+
+
+def convert(theme="", theme_colour_format="hex", palette="", distance_type=""):
     if palette:
-        palette_colours = list(map(Colour, palette.splitlines()))
-        theme_colours = list(map(Colour, set(re.compile(r'#[0-9a-f]{6}', re.IGNORECASE).findall(theme))))
+        def create_colour(colour_text): return Colour(colour_text, theme_colour_format)
+
+        palette_colours = list(map(create_colour, palette.splitlines()))
+        theme_colours = list(map(create_colour, read_theme_colours(theme, theme_colour_format)))
         theme_colour_to_palette_colour = {
             theme_colour.text: find_nearest_colour(palette_colours, theme_colour, distance_type).text
             for theme_colour in theme_colours
@@ -69,7 +87,8 @@ def main():
         with open(palette_file_name, 'r') as palette_file, \
                 open(theme_file_name, 'r') as theme_file, \
                 open(converted_theme_file_name, 'w') as converted_theme_file:
-            converted_theme_file.write(convert(theme_file.read(), palette_file.read(), distance_type))
+            converted_theme_file.write(
+                convert(theme=theme_file.read(), palette=palette_file.read(), distance_type=distance_type))
 
 
 if __name__ == '__main__':
