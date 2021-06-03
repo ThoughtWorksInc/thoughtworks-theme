@@ -4,8 +4,8 @@ import sys
 
 
 class ColourFormat:
-    def __init__(self, regex, evaluate):
-        self.regex = regex
+    def __init__(self, pattern, evaluate):
+        self.pattern = pattern
         self.evaluate = evaluate
 
 
@@ -18,7 +18,7 @@ class Colour:
 
     def __init__(self, text, format):
         self.text = text
-        self.rgb = self.formats[format].evaluate(text)
+        self.rgb = self.formats.get(format, self.formats["hex"]).evaluate(text)
 
     def __eq__(self, other):
         return all(value == another_value
@@ -60,10 +60,11 @@ def substitute(theme, theme_colour_to_palette_colour):
 
 
 def read_theme_colours(theme, theme_colour_format):
-    return set(re.compile(Colour.formats[theme_colour_format].regex, re.IGNORECASE).findall(theme))
+    colour_pattern = Colour.formats.get(theme_colour_format, Colour.formats["hex"]).pattern
+    return set(re.compile(colour_pattern, re.IGNORECASE).findall(theme))
 
 
-def convert(theme="", theme_colour_format="hex", palette="", distance_type=""):
+def convert(theme="", theme_colour_format="", palette="", distance_type=""):
     if palette:
         def create_colour(colour_text): return Colour(colour_text, theme_colour_format)
 
