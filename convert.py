@@ -4,31 +4,43 @@ import sys
 
 
 class ColourFormat:
-    def __init__(self, pattern, evaluate):
+    def __init__(self, pattern, parse, stringify):
         self.pattern = pattern
-        self.evaluate = evaluate
+        self.parse = parse
+        self.stringify = stringify
 
 
 class Colour:
     formats = {
         "hex": ColourFormat(
             r'#[0-9a-f]{6}',
-            lambda text: tuple(map(lambda value: int(value, base=16), (text[i:i + 2] for i in range(1, 7, 2))))),
+            lambda text: tuple(map(lambda value_text: int(value_text, base=16), (text[i:i + 2]
+                                                                                 for i in range(1, 7, 2)))),
+            lambda rgb: ("#" + "{:02X}" * 3).format(*rgb)
+        ),
+        "rgba_decimal": ColourFormat(
+            ' '.join([r'\d(?:\.\d+)?'] * 3),
+            lambda text: tuple(map(lambda value: float(value) * 255, text.split(' ')[0:3])),
+            lambda rgb: ' '.join(["{:g}"] * 3).format(*(value / 255 for value in rgb))
+        ),
     }
 
-    def __init__(self, text, format):
-        self.text = text
-        self.rgb = self.formats.get(format, self.formats["hex"]).evaluate(text)
+    def __init__(self, colour_text, colour_format):
+        self.original_text = colour_text
+        self.rgb = self.formats.get(colour_format, self.formats["hex"]).parse(colour_text)
 
     def __eq__(self, other):
         return all(value == another_value
                    for (value, another_value) in zip(self.rgb, other.rgb))
 
     def __repr__(self):
-        return "Colour(text=" + self.text + ",rgb=" + ",".join(map(str, self.rgb)) + ")"
+        return "Colour(original_text={}, rgb={})".format(self.original_text, self.rgb)
 
     def __sub__(self, other):
         return ColourDistance(self, other)
+
+    def __format__(self, colour_format):
+        return self.formats[colour_format].stringify(self.rgb)
 
 
 class ColourDistance:
@@ -55,8 +67,8 @@ def find_nearest_colour(palette_colours, theme_colour, distance_type):
 
 
 def substitute(theme, theme_colour_to_palette_colour):
-    pattern = re.compile('|'.join(theme_colour_to_palette_colour.keys()))
-    return pattern.sub(lambda matched_colour: theme_colour_to_palette_colour[matched_colour.group()], theme)
+    return re.compile('|'.join(theme_colour_to_palette_colour.keys())).sub(
+        lambda matched_colour: theme_colour_to_palette_colour[matched_colour.group()], theme)
 
 
 def read_theme_colours(theme, theme_colour_format):
@@ -64,14 +76,19 @@ def read_theme_colours(theme, theme_colour_format):
     return set(re.compile(colour_pattern, re.IGNORECASE).findall(theme))
 
 
+def read_palette_colours(palette):
+    return palette.splitlines()
+
+
 def convert(theme="", theme_colour_format="", palette="", distance_type=""):
     if palette:
-        def create_colour(colour_text): return Colour(colour_text, theme_colour_format)
-
-        palette_colours = list(map(create_colour, palette.splitlines()))
-        theme_colours = list(map(create_colour, read_theme_colours(theme, theme_colour_format)))
+        palette_colours = list(map(lambda palette_colour_text: Colour(palette_colour_text, "hex"),
+                                   read_palette_colours(palette)))
+        theme_colours = list(map(lambda theme_colour_text: Colour(theme_colour_text, theme_colour_format),
+                                 read_theme_colours(theme, theme_colour_format)))
         theme_colour_to_palette_colour = {
-            theme_colour.text: find_nearest_colour(palette_colours, theme_colour, distance_type).text
+            theme_colour.original_text:
+                format(find_nearest_colour(palette_colours, theme_colour, distance_type), theme_colour_format)
             for theme_colour in theme_colours
         }
         return substitute(theme, theme_colour_to_palette_colour)

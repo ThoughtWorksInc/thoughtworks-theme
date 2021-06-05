@@ -1,7 +1,7 @@
 import inspect
 import math
 import unittest
-from convert import convert, find_nearest_colour, Colour, ColourDistance
+from convert import convert, find_nearest_colour, Colour, ColourDistance, substitute
 
 
 class TestConvert(unittest.TestCase):
@@ -13,7 +13,7 @@ class TestConvert(unittest.TestCase):
         self.assertEqual(convert(theme="anything"), "anything")
 
     def test_convert_to_colours_in_palette(self):
-        self.assertEqual(convert(theme="#f0f0f0", theme_colour_format="hex", palette="#ffffff"), "#ffffff")
+        self.assertEqual(convert(theme="#f0f0f0", theme_colour_format="hex", palette="#FFFFFF"), "#FFFFFF")
 
     def test_convert_to_least_euclidean_distance_colour_in_palette_when_no_distance_type_specified(self):
         # sqrt(49) < sqrt(51) < sqrt(57)
@@ -45,7 +45,7 @@ class TestConvert(unittest.TestCase):
             """
         ), distance_type="uniform"), "#040405")
 
-    def test_convert_all_the_colour_like_text_in_the_content(self):
+    def test_convert_all_hex_colour_like_text_in_the_content(self):
         self.assertEqual(convert(
             theme=inspect.cleandoc(
                 """
@@ -63,8 +63,31 @@ class TestConvert(unittest.TestCase):
             )),
             inspect.cleandoc(
                 """
-                <colour>#0000ff</colour>
-                <anotherColour>#ff0000</anotherColour>
+                <colour>#0000FF</colour>
+                <anotherColour>#FF0000</anotherColour>
+                """
+            ))
+
+    def test_convert_all_rgba_decimal_colour_like_text_in_the_content(self):
+        self.assertEqual(convert(
+            theme=inspect.cleandoc(
+                """
+                <colour>0.1 0.2 0.3 1</colour>
+                <anotherColour>1 0.9 0.8 1</anotherColour>
+                """
+            ),
+            theme_colour_format="rgba_decimal",
+            palette=inspect.cleandoc(
+                """
+                #ff0000
+                #00ff00
+                #0000ff
+                """
+            )),
+            inspect.cleandoc(
+                """
+                <colour>0 0 1 1</colour>
+                <anotherColour>1 0 0 1</anotherColour>
                 """
             ))
 
@@ -86,16 +109,25 @@ class TestFindNearestColour(unittest.TestCase):
 
 
 class TestColour(unittest.TestCase):
-    def test_colour_evaluates_rgb_when_instantiating(self):
+    def test_colour_keep_original_text_when_instantiating(self):
+        self.assertEqual("#000000", Colour("#000000", "hex").original_text)
+
+    def test_colour_evaluates_rgb_from_hex_when_instantiating(self):
         self.assertTupleEqual(Colour("#000000", "hex").rgb, (0, 0, 0))
 
-    def test_colour_represents_as_comma_delimited_text(self):
-        self.assertEqual(repr(Colour("#000000", "hex")), "Colour(text=#000000,rgb=0,0,0)")
+    def test_colour_evaluates_rgb_from_rgba_decimal_when_instantiating(self):
+        self.assertTupleEqual(Colour("0 0 0 0", "rgba_decimal").rgb, (0, 0, 0))
+        self.assertTupleEqual(Colour("0.2 0.2 0.2 0.2", "rgba_decimal").rgb, (51, 51, 51))
+        self.assertTupleEqual(Colour("1 1 1 1", "rgba_decimal").rgb, (255, 255, 255))
+
+    def test_colour_represents_as_rgb_tuple(self):
+        colour = Colour("#000000", "hex")
+        self.assertEqual("Colour(original_text=#000000, rgb=(0, 0, 0))", repr(colour))
 
     def test_colour_represents_twice(self):
         colour = Colour("#000000", "hex")
-        self.assertEqual(repr(colour), "Colour(text=#000000,rgb=0,0,0)")
-        self.assertEqual(repr(colour), "Colour(text=#000000,rgb=0,0,0)")
+        self.assertEqual("Colour(original_text=#000000, rgb=(0, 0, 0))", repr(colour))
+        self.assertEqual("Colour(original_text=#000000, rgb=(0, 0, 0))", repr(colour))
 
     def test_colour_equals_when_text_is_exactly_same(self):
         self.assertEqual(Colour("#000000", "hex"), Colour("#000000", "hex"))
@@ -106,6 +138,11 @@ class TestColour(unittest.TestCase):
     def test_colours_subtraction_results_in_a_colour_distance(self):
         self.assertEqual(Colour("#010101", "hex") - Colour("#000000", "hex"), ColourDistance(Colour("#010101", "hex"),
                                                                                              Colour("#000000", "hex")))
+
+    def test_colour_outputs_to_text_by_format(self):
+        colour = Colour("#333333", "hex")
+        self.assertEqual(format(colour, "hex"), "#333333")
+        self.assertEqual(format(colour, "rgba_decimal"), "0.2 0.2 0.2")
 
 
 class TestColourDifference(unittest.TestCase):
