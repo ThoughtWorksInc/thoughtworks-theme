@@ -78,6 +78,22 @@ class TestConvert(unittest.TestCase):
                 """)
         self.assertEqual(converted_result, convert(theme=theme, theme_colour_format="rgba_decimal", palette=palette))
 
+    def test_convert_all_rgba_decimal_colour_like_text_in_the_content_without_changing_alpha_value(self):
+        converted_result = inspect.cleandoc("""
+                <colour>0 0 1 0.618</colour>
+                <anotherColour>1 0 0 0.314</anotherColour>
+                """)
+        theme = inspect.cleandoc("""
+                <colour>0.1 0.2 0.3 0.618</colour>
+                <anotherColour>1 0.9 0.8 0.314</anotherColour>
+                """)
+        palette = inspect.cleandoc("""
+                #ff0000
+                #00ff00
+                #0000ff
+                """)
+        self.assertEqual(converted_result, convert(theme=theme, theme_colour_format="rgba_decimal", palette=palette))
+
     def test_convert_case_insensitively(self):
         self.assertEqual("#000000", convert(theme="#ABCDEF", theme_colour_format="hex", palette="#000000"))
 
