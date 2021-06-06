@@ -62,8 +62,8 @@ class ColourDistance:
         return self.types.get(distance_type, self.types["euclidean"])(self.rgb_differences)
 
 
-def find_nearest_colour(palette_colours, theme_colour, distance_type):
-    return min(palette_colours, key=lambda palette_colour: (theme_colour - palette_colour)[distance_type])
+def find_nearest_colour(colours_to_find, origin_colour, distance_type):
+    return min(colours_to_find, key=lambda colour_to_find: (origin_colour - colour_to_find)[distance_type])
 
 
 def substitute(theme, theme_colour_to_palette_colour):
