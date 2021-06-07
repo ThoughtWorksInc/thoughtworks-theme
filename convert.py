@@ -95,6 +95,13 @@ def convert(theme="", theme_colour_format="", palette="", distance_type=""):
     return theme
 
 
+def get_colour_format(file_name_extension):
+    file_name_extension_to_colour_format = {
+        "xccolortheme": "rgba_decimal"
+    }
+    return file_name_extension_to_colour_format.get(file_name_extension, "hex")
+
+
 def main():
     palette_file_name = sys.argv[1]
     theme_file_name = sys.argv[2]
@@ -106,7 +113,10 @@ def main():
                 open(theme_file_name, 'r') as theme_file, \
                 open(converted_theme_file_name, 'w') as converted_theme_file:
             converted_theme_file.write(
-                convert(theme=theme_file.read(), palette=palette_file.read(), distance_type=distance_type))
+                convert(theme=theme_file.read(),
+                        theme_colour_format=get_colour_format(theme_file_name_extension),
+                        palette=palette_file.read(),
+                        distance_type=distance_type))
 
 
 if __name__ == '__main__':
