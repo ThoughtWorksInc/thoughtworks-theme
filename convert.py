@@ -12,11 +12,17 @@ class ColourFormat:
 
 class Colour:
     formats = {
-        "hex": ColourFormat(
+        "#hex": ColourFormat(
             r'#[0-9a-f]{6}',
             lambda text: tuple(map(lambda value_text: int(value_text, base=16), (text[i:i + 2]
                                                                                  for i in range(1, 7, 2)))),
             lambda rgb: ("#" + "{:02X}" * 3).format(*rgb)
+        ),
+        "hex_with_quotes": ColourFormat(
+            r'"[0-9a-f]{6}"',
+            lambda text: tuple(map(lambda value_text: int(value_text, base=16), (text[i:i + 2]
+                                                                                 for i in range(1, 7, 2)))),
+            lambda rgb: ("\"" + "{:02X}" * 3 + "\"").format(*rgb)
         ),
         "rgba_decimal": ColourFormat(
             ' '.join([r'\d(?:\.\d+)?'] * 3),
@@ -27,7 +33,7 @@ class Colour:
 
     def __init__(self, colour_text, colour_format):
         self.original_text = colour_text
-        self.rgb = self.formats.get(colour_format, self.formats["hex"]).parse(colour_text)
+        self.rgb = self.formats.get(colour_format, self.formats["#hex"]).parse(colour_text)
 
     def __eq__(self, other):
         return all(value == another_value
@@ -72,7 +78,7 @@ def substitute(theme, theme_colour_to_palette_colour):
 
 
 def read_theme_colours(theme, theme_colour_format):
-    colour_pattern = Colour.formats.get(theme_colour_format, Colour.formats["hex"]).pattern
+    colour_pattern = Colour.formats.get(theme_colour_format, Colour.formats["#hex"]).pattern
     return set(re.compile(colour_pattern, re.IGNORECASE).findall(theme))
 
 
@@ -82,7 +88,7 @@ def read_palette_colours(palette):
 
 def convert(theme="", theme_colour_format="", palette="", distance_type=""):
     if palette:
-        palette_colours = list(map(lambda palette_colour_text: Colour(palette_colour_text, "hex"),
+        palette_colours = list(map(lambda palette_colour_text: Colour(palette_colour_text, "#hex"),
                                    read_palette_colours(palette)))
         theme_colours = list(map(lambda theme_colour_text: Colour(theme_colour_text, theme_colour_format),
                                  read_theme_colours(theme, theme_colour_format)))
@@ -97,9 +103,10 @@ def convert(theme="", theme_colour_format="", palette="", distance_type=""):
 
 def get_colour_format(file_name_extension):
     file_name_extension_to_colour_format = {
-        "xccolortheme": "rgba_decimal"
+        "xccolortheme": "rgba_decimal",
+        "icls": "hex_with_quotes"
     }
-    return file_name_extension_to_colour_format.get(file_name_extension, "hex")
+    return file_name_extension_to_colour_format.get(file_name_extension, "#hex")
 
 
 def main():

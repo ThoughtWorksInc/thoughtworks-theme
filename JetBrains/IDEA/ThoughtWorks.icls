@@ -22,14 +22,14 @@
     <option name="BASH.SHEBANG" baseAttributes="BASH.LINE_COMMENT" />
     <option name="CTRL_CLICKABLE">
       <value>
-        <option name="FOREGROUND" value="78bf" />
-        <option name="EFFECT_COLOR" value="78bf" />
+        <option name="FOREGROUND" value="0078bf" />
+        <option name="EFFECT_COLOR" value="0078bf" />
         <option name="EFFECT_TYPE" value="1" />
       </value>
     </option>
     <option name="CUSTOM_INVALID_STRING_ESCAPE_ATTRIBUTES">
       <value>
-        <option name="FOREGROUND" value="aa5b" />
+        <option name="FOREGROUND" value="00aa5b" />
         <option name="BACKGROUND" value="f2ba97" />
       </value>
     </option>
@@ -42,7 +42,7 @@
     </option>
     <option name="CUSTOM_KEYWORD3_ATTRIBUTES">
       <value>
-        <option name="FOREGROUND" value="4020" />
+        <option name="FOREGROUND" value="004020" />
         <option name="FONT_TYPE" value="1" />
       </value>
     </option>
@@ -104,7 +104,7 @@
     </option>
     <option name="DEFAULT_ENTITY">
       <value>
-        <option name="FOREGROUND" value="78bf" />
+        <option name="FOREGROUND" value="0078bf" />
         <option name="FONT_TYPE" value="1" />
       </value>
     </option>
@@ -117,13 +117,13 @@
     </option>
     <option name="DEFAULT_INVALID_STRING_ESCAPE">
       <value>
-        <option name="FOREGROUND" value="aa5b" />
+        <option name="FOREGROUND" value="00aa5b" />
         <option name="BACKGROUND" value="f2ba97" />
       </value>
     </option>
     <option name="DEFAULT_KEYWORD">
       <value>
-        <option name="FOREGROUND" value="78bf" />
+        <option name="FOREGROUND" value="0078bf" />
         <option name="FONT_TYPE" value="1" />
       </value>
     </option>
@@ -181,7 +181,7 @@
     </option>
     <option name="DEFAULT_STRING">
       <value>
-        <option name="FOREGROUND" value="aa5b" />
+        <option name="FOREGROUND" value="00aa5b" />
         <option name="FONT_TYPE" value="1" />
       </value>
     </option>
@@ -197,7 +197,7 @@
     </option>
     <option name="DEFAULT_VALID_STRING_ESCAPE">
       <value>
-        <option name="FOREGROUND" value="78bf" />
+        <option name="FOREGROUND" value="0078bf" />
         <option name="FONT_TYPE" value="1" />
       </value>
     </option>
@@ -223,7 +223,7 @@
     <option name="DIFF_MODIFIED">
       <value>
         <option name="BACKGROUND" value="7dced5" />
-        <option name="ERROR_STRIPE_COLOR" value="bccd" />
+        <option name="ERROR_STRIPE_COLOR" value="00bccd" />
       </value>
     </option>
     <option name="ERRORS_ATTRIBUTES">
@@ -241,9 +241,9 @@
     </option>
     <option name="FOLLOWED_HYPERLINK_ATTRIBUTES">
       <value>
-        <option name="FOREGROUND" value="78bf" />
+        <option name="FOREGROUND" value="0078bf" />
         <option name="BACKGROUND" value="eeeeee" />
-        <option name="EFFECT_COLOR" value="78bf" />
+        <option name="EFFECT_COLOR" value="0078bf" />
         <option name="EFFECT_TYPE" value="1" />
       </value>
     </option>
@@ -257,13 +257,13 @@
     </option>
     <option name="HTTP_REQUEST_PARAMETER_VALUE">
       <value>
-        <option name="FOREGROUND" value="aa5b" />
+        <option name="FOREGROUND" value="00aa5b" />
       </value>
     </option>
     <option name="HYPERLINK_ATTRIBUTES">
       <value>
-        <option name="FOREGROUND" value="78bf" />
-        <option name="EFFECT_COLOR" value="78bf" />
+        <option name="FOREGROUND" value="0078bf" />
+        <option name="EFFECT_COLOR" value="0078bf" />
         <option name="EFFECT_TYPE" value="1" />
       </value>
     </option>
@@ -335,9 +335,9 @@
     </option>
     <option name="TODO_DEFAULT_ATTRIBUTES">
       <value>
-        <option name="FOREGROUND" value="78bf" />
+        <option name="FOREGROUND" value="0078bf" />
         <option name="FONT_TYPE" value="3" />
-        <option name="ERROR_STRIPE_COLOR" value="78bf" />
+        <option name="ERROR_STRIPE_COLOR" value="0078bf" />
       </value>
     </option>
     <option name="TS.TYPE_GUARD">
@@ -347,12 +347,12 @@
     </option>
     <option name="TS.TYPE_PARAMETER">
       <value>
-        <option name="FOREGROUND" value="bccd" />
+        <option name="FOREGROUND" value="00bccd" />
       </value>
     </option>
     <option name="TYPE_PARAMETER_NAME_ATTRIBUTES">
       <value>
-        <option name="FOREGROUND" value="bccd" />
+        <option name="FOREGROUND" value="00bccd" />
       </value>
     </option>
     <option name="TYPO">
